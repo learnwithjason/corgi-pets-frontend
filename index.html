@@ -40,7 +40,7 @@
 
     <script>
       async function addReaction(id, type) {
-        const response = await fetch('http://165.227.20.29/reactions', {
+        const response = await fetch('/.netlify/functions/add-reaction', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -57,7 +57,7 @@
       }
 
       async function loadCorgis() {
-        const data = await fetch('http://165.227.20.29/corgis')
+        const data = await fetch('/.netlify/functions/load-corgis')
           .then((res) => res.json())
           .catch((err) => console.error(err));
 
