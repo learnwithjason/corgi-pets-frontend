@@ -40,6 +40,7 @@
 
     <script>
       async function addReaction(id, type) {
+        console.log(id);
         const response = await fetch('/.netlify/functions/add-reaction', {
           method: 'POST',
           headers: {
@@ -66,6 +67,8 @@
 
         data.forEach((corgi) => {
           const node = template.content.cloneNode(true);
+
+          console.log(corgi);
 
           const img = node.querySelector('img');
           img.src = corgi.photo;

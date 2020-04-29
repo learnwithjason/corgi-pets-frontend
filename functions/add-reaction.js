@@ -1,7 +1,7 @@
 const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
-  const { id, type } = JSON.parse(event.body);
+  const { corgi, type } = JSON.parse(event.body);
   const response = await fetch('http://165.227.20.29/reactions', {
     method: 'POST',
     headers: {
@@ -9,7 +9,7 @@ exports.handler = async (event) => {
     },
     body: JSON.stringify({
       type,
-      corgi: id,
+      corgi,
     }),
   })
     .then((res) => res.json())
