@@ -1,0 +1,148 @@
+---
+layout: default
+
+# keep it short! shown in the header
+title: Strapi on Digital Ocean + Netlify Functions
+
+# these are all optional and add links to the footer
+repo: learnwithjason/corgi-pets-frontend
+episode: https://www.learnwithjason.dev/build-jamstack-apps-with-custom-apis
+tutorial:
+---
+
+<style>
+  .corgi-kennel {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, 300px);
+    text-align: center;
+  }
+
+  .corgi img {
+    height: 250px;
+    width: 100%;
+    object-fit: cover;
+  }
+
+  .credit {
+    color: var(--text-muted);
+    font-weight: 200;
+    margin-top: 0;
+  }
+
+  .reactions {
+    display: flex;
+    justify-content: space-around;
+  }
+
+  .pet,
+  .boop {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .count {
+    color: var(--black);
+    font-size: 1.5rem;
+    font-weight: 900;
+  }
+
+  .pet button,
+  .boop button {
+    background: var(--light-gray);
+    border: none;
+    border-radius: 0.25rem;
+    color: var(--gray-dark);
+    font-family: var(--font-family);
+    font-size: 1rem;
+    font-weight: 900;
+    padding: 0.25rem 0.5rem;
+  }
+</style>
+
+<h1>Look at These Good Doggos</h1>
+
+<div class="corgi-kennel"></div>
+
+<template id="corgi">
+  <div class="corgi">
+    <img src="" alt="" />
+    <p class="credit"></p>
+    <div class="reactions">
+      <div class="pet">
+        <span class="count"></span>
+        <button>Pet This Corgo</button>
+      </div>
+      <div class="boop">
+        <span class="count"></span>
+        <button>Boop This Corgo</button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+  async function addReaction(id, type) {
+    console.log(id);
+    const response = await fetch('/.netlify/functions/add-reaction', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        type,
+        corgi: id,
+      }),
+    })
+      .then((res) => res.json())
+      .catch((err) => console.error(err));
+
+    console.log(response);
+  }
+
+  async function loadCorgis() {
+    const data = await fetch('/.netlify/functions/load-corgis')
+      .then((res) => res.json())
+      .catch((err) => console.error(err));
+
+    const template = document.getElementById('corgi');
+    const container = document.querySelector('.corgi-kennel');
+
+    data.forEach((corgi) => {
+      const node = template.content.cloneNode(true);
+
+      console.log(corgi);
+
+      const img = node.querySelector('img');
+      img.src = corgi.photo;
+      img.alt = corgi.title;
+
+      node.querySelector('.credit').innerText = `Photo by ${corgi.credit}`;
+
+      const pets = corgi.reactions.filter((r) => r.type === 'pet');
+      const boops = corgi.reactions.filter((r) => r.type === 'boop');
+      const pet = node.querySelector('.pet');
+      const boop = node.querySelector('.boop');
+
+      const petHandler = () => addReaction(corgi.id, 'pet');
+      const boopHandler = () => addReaction(corgi.id, 'boop');
+
+      pet.querySelector('.count').innerText = pets.length;
+      pet.querySelector('button').addEventListener('click', () => {
+        petHandler();
+        const currentCount = Number(pet.querySelector('.count').innerText);
+        pet.querySelector('.count').innerText = currentCount + 1;
+      });
+      boop.querySelector('.count').innerText = boops.length;
+      boop.querySelector('button').addEventListener('click', () => {
+        boopHandler();
+        const currentCount = Number(boop.querySelector('.count').innerText);
+        boop.querySelector('.count').innerText = currentCount + 1;
+      });
+
+      container.appendChild(node);
+    });
+  }
+
+  loadCorgis();
+</script>
