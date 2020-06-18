@@ -2,7 +2,7 @@ const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
   const { corgi, type } = JSON.parse(event.body);
-  const response = await fetch('http://165.227.20.29/reactions', {
+  const response = await fetch('http://167.99.163.11/reactions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
